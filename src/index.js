@@ -1,7 +1,7 @@
-const { createBatches } = require('./batch');
 const { requestBatcher } = require('./requestBatcher');
+const { retryHelper } = require('./retryHelper');
 
 module.exports = {
-  createBatches,
   requestBatcher,
+  retryHelper,
 };
