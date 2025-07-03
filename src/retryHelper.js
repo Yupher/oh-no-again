@@ -13,18 +13,19 @@ async function retryHelper(
   { retries = 3, delay = 300, timeout = 1000 } = {},
 ) {
   let lastError;
+  let timer;
 
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeout);
+      timer = setTimeout(() => controller.abort(), timeout);
 
       const result = await fn(controller.signal); // signal passed
       clearTimeout(timer);
       return result;
     } catch (err) {
+      clearTimeout(timer);
       lastError = err;
-
       if (i < retries - 1) {
         await wait(delay * 2 ** i); // backoff
       }
