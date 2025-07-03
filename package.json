@@ -1,5 +1,5 @@
 {
-  "name": "@yupher/oh-no-again",
+  "name": "oh-no-again",
   "version": "0.1.0",
   "description": "Retry and batching utility with abort, timeout, and concurrency support. Inspired by real-world pain.",
   "main": "src/index.js",
