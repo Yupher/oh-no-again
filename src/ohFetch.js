@@ -1,14 +1,19 @@
-// src/ohFetch.js
+/**
+ * @typedef {Object} FetchOptions
+ * @property {string} url - The URL to fetch.
+ * @property {string} [method='GET'] - HTTP method (GET, POST, etc.).
+ * @property {object} [headers] - Request headers.
+ * @property {AbortSignal} [signal] - Optional AbortSignal to cancel the request.
+ * @property {object} [body] - Request body. Automatically stringified if present.
+ */
+
 /**
  * Perform an HTTP request with native fetch,
- * default headers/body, JSON parsing, and timeout.
+ * default headers/body handling, JSON parsing, and abort support.
  *
- * @param {object} data
- * @param {string} data.url - The URL to fetch.
- * @param {string} [data.method='GET'] - HTTP method (GET, POST, etc.).
- * @param {object} [data.headers] - Custom headers to include in the request.
- * @returns {Promise<any>} Parsed JSON or text response
- * @throws {Error} If fetch fails or response is not ok
+ * @param {FetchOptions} data - The request configuration.
+ * @returns {Promise<any>} Parsed JSON or text response.
+ * @throws {Error} If the fetch fails or the response is not OK.
  */
 async function ohFetch(data) {
   if (typeof data.url !== 'string') {

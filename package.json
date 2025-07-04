@@ -1,12 +1,19 @@
 {
   "name": "oh-no-again",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Retry and batching utility with abort, timeout, and concurrency support. Inspired by real-world pain.",
-  "main": "src/index.js",
+  "main": "index.js",
   "type": "commonjs",
+  "types": "./oh-no-again.d.ts",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./index.js"
   },
+  "files": [
+    "index.js",
+    "oh-no-again.d.ts",
+    "README.md",
+    "src/"
+  ],
   "keywords": [
     "retry",
     "batching",
@@ -23,5 +30,8 @@
   },
   "bugs": {
     "url": "https://github.com/yupher/oh-no-again/issues"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
   }
 }

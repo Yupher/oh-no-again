@@ -1,12 +1,19 @@
 const { setTimeout: wait } = require('timers/promises');
 
 /**
+ * @typedef {Object} RetryOptions
+ * @property {number} [retries=3] - Max number of retry attempts.
+ * @property {number} [delay=300] - Base delay in milliseconds for exponential backoff.
+ * @property {number} [timeout=1000] - Timeout for each attempt in milliseconds.
+ */
+
+/**
  * Retry a function with timeout and exponential backoff.
- * @param {() => Promise<any>} fn - The async function to execute.
- * @param {Object} options - Retry options.
- * @param {number} options.retries - Max number of retries.
- * @param {number} options.delay - Delay between retries (ms).
- * @param {number} options.timeout - Max time allowed per try (ms).
+ *
+ * @template T
+ * @param {(signal: AbortSignal) => Promise<T>} fn - The async function that receives an AbortSignal.
+ * @param {RetryOptions} [options={}] - Retry configuration options.
+ * @returns {Promise<T>} Resolves with the result of the function, or throws after retries fail.
  */
 async function retryHelper(
   fn,

@@ -1,4 +1,4 @@
-const { retryHelper } = require('oh-no-again');
+const { retryHelper } = require('..');
 
 (async () => {
   try {

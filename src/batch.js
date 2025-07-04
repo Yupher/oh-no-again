@@ -1,9 +1,11 @@
 /**
- * Splits an array into chunks of a given size.
- * @param {Array} array - The full array to split.
- * @param {number} size - Number of items per batch.
- * @returns {Array[]} - An array of arrays (batches).
- * @throws {TypeError} if arguments are invalid.
+ * Splits an array into smaller chunks (batches) of a given size.
+ *
+ * @template T
+ * @param {T[]} array - The input array to split.
+ * @param {number} size - The number of items per batch (must be > 0).
+ * @returns {T[][]} An array of batches (arrays of items).
+ * @throws {TypeError} If input is not an array or size is not a positive number.
  */
 function createBatches(array, size) {
   if (!Array.isArray(array)) {

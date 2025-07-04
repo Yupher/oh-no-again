@@ -3,13 +3,15 @@
 A tiny and powerful retry + batching + timeout + abort utility for Node.js.  
 Built from real-world frustration with unreliable APIs and network issues.
 
+---
+
 ## ✨ Features
 
 - ✅ Retry with exponential backoff
 - ✅ Timeout with `AbortController` support (native `fetch`)
 - ✅ Concurrency-limited batching (like `p-limit`)
 - ✅ Works out of the box with `fetch`
-- ✅ Supports both CommonJS and ESM (soon)
+- ✅ TypeScript support (as of v0.2.0)
 - ✅ Tiny and dependency-free
 
 ---
@@ -20,38 +22,26 @@ Built from real-world frustration with unreliable APIs and network issues.
 npm install oh-no-again
 ```
 
+---
+
 ## 📦 Usage
 
-### 🔁 Retry a flaky fetch request
+### 🔁 Retry a flaky `fetch()` request
 
 ```js
 const { retryHelper } = require('oh-no-again');
 
-try {
-  const result = await retryHelper(
-    (signal) =>
-      fetch('https://jsonplaceholder.typicode.com/users/1', { signal }),
-    {
-      retries: 3,
-      delay: 100,
-      timeout: 200,
-    },
-  );
-
-  console.log(await result.json());
-} catch (error) {
-  console.log(error.message);
-}
+const result = await retryHelper(async (signal) => {
+  return await fetch('https://api.example.com/data', { signal });
+});
 ```
-
----
 
 ### 🚦 Batching with concurrency limit
 
 ```js
 const { requestBatcher } = require('oh-no-again');
 
-const USERS = [
+const users = [
   { id: 1 },
   { id: 2 },
   { id: 3 },
@@ -60,31 +50,18 @@ const USERS = [
   { id: 6 },
 ];
 
-(async () => {
-  try {
-    const users = await requestBatcher(
-      USERS,
-      3, // Max 3 requests at once
-      (user) => ({
-        url: `https://jsonplaceholder.typicode.com/users/${user.id}`,
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }),
-      {
-        retries: 3,
-        delay: 300,
-        timeout: 400,
-      },
-    );
-
-    console.log(
-      'Fetched users:',
-      users.map((u) => u.name),
-    );
-  } catch (err) {
-    console.error('Fetch failed:', err.message);
-  }
-})();
+const result = await requestBatcher(
+  users,
+  2, // max 2 at a time
+  (user) => ({
+    url: `https://jsonplaceholder.typicode.com/users/${user.id}`,
+  }),
+  {
+    retries: 3,
+    delay: 200,
+    timeout: 1000,
+  },
+);
 ```
 
 ---
@@ -93,46 +70,53 @@ const USERS = [
 
 ### `retryHelper(fn, options)`
 
-| Param     | Type               | Description                                 |
-| --------- | ------------------ | ------------------------------------------- |
-| `fn`      | `Function(signal)` | Your async function using `AbortSignal`     |
-| `options` | `object`           | Retry config: `{ retries, delay, timeout }` |
+| Param     | Type                          | Description                             |
+| --------- | ----------------------------- | --------------------------------------- |
+| `fn`      | `(signal) => Promise<any>`    | Your async function that accepts signal |
+| `options` | `{ retries, delay, timeout }` | Optional retry config                   |
 
 ### `requestBatcher(array, concurrency, taskFn, options)`
 
-| Param         | Type                          | Description                             |
-| ------------- | ----------------------------- | --------------------------------------- |
-| `array`       | `Array`                       | Items to process                        |
-| `concurrency` | `number`                      | Max parallel operations                 |
-| `taskFn`      | `(item) => RequestConfig`     | Returns { url, method, headers, body? } |
-| `options`     | `{ retries, delay, timeout }` | Optional retry config                   |
+| Param         | Type                          | Description                     |
+| ------------- | ----------------------------- | ------------------------------- |
+| `array`       | `Array`                       | Items to process                |
+| `concurrency` | `number`                      | Max parallel operations         |
+| `taskFn`      | `(item) => TaskRequest`       | Function returning fetch config |
+| `options`     | `{ retries, delay, timeout }` | Optional retry config           |
 
 ---
 
-## 🔮 Roadmap
+## 🆕 Changelog
+
+### v0.2.0
+
+- ✅ Added TypeScript typings (`oh-no-again.d.ts`)
+- ✅ Improved function doc annotations for better IntelliSense
+
+### v0.1.0
+
+- 🎉 Initial release with:
+  - Retry logic with backoff
+  - Timeout + AbortController
+  - requestBatcher with concurrency
+
+---
 
 - ✅ Native fetch support
 - ⏳ Axios support (dropped, may revisit)
-- ⏳ TypeScript typings
+- ✅ TypeScript typings
 - ⏳ CLI version
 - ⏳ Dual ESM + CJS support
 - ⏳ Event hooks (`onRetry`, `onAbort`, etc.)
 
----
-
 ## 🧑‍💻 Author
 
-**Bouhadjila Hamza**  
-Made with ☕ and pain in the real world.
-
----
+**Bouhadjila Hamza** — Built with ☕, frustration, and late-night debugging.
 
 ## 🪪 License
 
 MIT
 
----
-
 ## 💡 Name origin
 
-> "Oh no… not again." — You, every time a flaky request fails in production.
+_"Oh no… not again."_ — You, every time a flaky request fails in production.
