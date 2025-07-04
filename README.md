@@ -86,7 +86,18 @@ const result = await requestBatcher(
 
 ---
 
+## 🧠 Requirements
+
+- Node.js v22.0.0 or higher
+
 ## 🆕 Changelog
+
+### v0.2.1
+
+- ✅ Added TypeScript support with .d.ts file
+- ✅ Added dual module support: CommonJS + ESM
+- 🔧 Internal refactor to support fetch abstraction
+- 🛠 Improved API docs
 
 ### v0.2.0
 
@@ -106,7 +117,7 @@ const result = await requestBatcher(
 - ⏳ Axios support (dropped, may revisit)
 - ✅ TypeScript typings
 - ⏳ CLI version
-- ⏳ Dual ESM + CJS support
+- ✅ Dual ESM + CJS support
 - ⏳ Event hooks (`onRetry`, `onAbort`, etc.)
 
 ## 🧑‍💻 Author
