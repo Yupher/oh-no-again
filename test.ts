@@ -5,10 +5,16 @@ retryHelper((signal) => {
 }).then();
 
 requestBatcher(
-  [1, 2, 3],
+  [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }],
   2,
-  (id) => ({
+  ({ id }) => ({
     url: `https://jsonplaceholder.typicode.com/users/${id}`,
   }),
-  { retries: 2 },
+  {
+    retries: 2,
+    timeout: 300,
+    hooks: {
+      onBatchStart: (i, batch) => console.log(i, batch),
+    },
+  },
 ).then(console.log);

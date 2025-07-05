@@ -5,6 +5,11 @@ const { setTimeout: wait } = require('timers/promises');
  * @property {number} [retries=3] - Max number of retry attempts.
  * @property {number} [delay=300] - Base delay in milliseconds for exponential backoff.
  * @property {number} [timeout=1000] - Timeout for each attempt in milliseconds.
+ * @property {Object} [hooks] - Optional lifecycle hooks.
+ * @property {(error: Error, attempt: number) => void} [hooks.onRetry] - Called on each retry attempt.
+ * @property {(error: Error) => void} [hooks.onAbort] - Called when an attempt is aborted due to timeout.
+ * @property {(result: any) => void} [hooks.onSuccess] - Called on successful attempt.
+ * @property {(error: Error) => void} [hooks.onFailure] - Called when all attempts fail.
  */
 
 /**
@@ -17,7 +22,7 @@ const { setTimeout: wait } = require('timers/promises');
  */
 async function retryHelper(
   fn,
-  { retries = 3, delay = 300, timeout = 1000 } = {},
+  { retries = 3, delay = 300, timeout = 1000, hooks = {} } = {},
 ) {
   let lastError;
   let timer;
@@ -29,16 +34,21 @@ async function retryHelper(
 
       const result = await fn(controller.signal); // signal passed
       clearTimeout(timer);
+      if (hooks.onSuccess) hooks.onSuccess(result);
       return result;
     } catch (err) {
       clearTimeout(timer);
       lastError = err;
+      if (err.name === 'AbortError' && hooks.onAbort) {
+        hooks.onAbort(err);
+      }
       if (i < retries - 1) {
+        if (hooks.onRetry) hooks.onRetry(err, i);
         await wait(delay * 2 ** i); // backoff
       }
     }
   }
-
+  if (hooks.onFailure) hooks.onFailure(lastError);
   throw lastError;
 }
 

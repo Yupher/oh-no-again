@@ -12,6 +12,7 @@ export interface RetryOptions {
 
   /** Timeout per attempt in milliseconds (default: 1000ms) */
   timeout?: number;
+  hooks?: RetryHooks;
 }
 
 /**
@@ -41,6 +42,7 @@ export interface TaskRequest {
 export interface BatcherOptions extends RetryOptions {
   failFast?: boolean; // Stop all on first error
   returnMeta?: boolean; // Return full metadata per task
+  hooks?: BatchHooks;
 }
 export interface BatchSuccess<TInput, TResult> {
   item: TInput;
@@ -52,6 +54,16 @@ export interface BatchFailure<TInput> {
   item: TInput;
   error: string;
   success: false;
+}
+export interface RetryHooks {
+  onRetry?: (error: Error, attempt: number) => void;
+  onAbort?: (error: Error) => void;
+  onSuccess?: (result: any) => void;
+  onFailure?: (error: Error) => void;
+}
+export interface BatchHooks extends RetryHooks {
+  onBatchStart?: (batchIndex: number, batch: any[]) => void;
+  onBatchComplete?: (batchIndex: number, results: any[]) => void;
 }
 
 /**

@@ -10,6 +10,13 @@ const { ohFetch } = require('./ohFetch');
  * @property {string} [method='GET'] - HTTP method for the fetch request.
  * @property {Object.<string, string>} [headers] - Headers for the fetch request.
  * @property {any} [body] - Optional body payload for POST/PUT requests.
+ * @property {Object} [hooks] - Optional lifecycle hooks.
+ * @property {(error: Error, attempt: number) => void} [hooks.onRetry] - Called on retry attempt.
+ * @property {(error: Error) => void} [hooks.onAbort] - Called if a request is aborted.
+ * @property {(result: any) => void} [hooks.onSuccess] - Called on successful request.
+ * @property {(error: Error) => void} [hooks.onFailure] - Called after final failure.
+ * @property {(batchIndex: number, batch: any[]) => void} [hooks.onBatchStart] - Called before starting a batch.
+ * @property {(batchIndex: number, results: any[]) => void} [hooks.onBatchComplete] - Called after completing a batch.
  */
 
 /**
@@ -32,14 +39,22 @@ async function requestBatcher(data, batchSize, taskFn, options = {}) {
     timeout = 1000,
     failFast = false,
     returnMeta = false,
+    hooks = {},
   } = options;
-
+  let index = 0;
   for (const batch of batches) {
+    if (hooks.onBatchStart) hooks.onBatchStart(index, batch);
+
     const promises = batch.map((item) => {
       const fn = (signal) => ohFetch({ ...taskFn(item), signal });
       const result =
         options.retries > 0
-          ? retryHelper(fn, { retries, delay, timeout })
+          ? retryHelper(fn, {
+              retries,
+              delay,
+              timeout,
+              hooks,
+            })
           : fn();
       return result
         .then((res) =>
@@ -55,6 +70,8 @@ async function requestBatcher(data, batchSize, taskFn, options = {}) {
 
     const batchResults = await Promise.all(promises);
     results.push(...batchResults);
+    if (hooks.onBatchComplete) hooks.onBatchComplete(index, batchResults);
+    index++;
   }
 
   return results;
