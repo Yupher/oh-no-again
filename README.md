@@ -10,9 +10,11 @@ Built from real-world frustration with unreliable APIs and network issues.
 - ✅ Retry with exponential backoff
 - ✅ Timeout with `AbortController` support (native `fetch`)
 - ✅ Concurrency-limited batching (like `p-limit`)
-- ✅ Works out of the box with `fetch`
-- ✅ TypeScript support (as of v0.2.0)
-- ✅ Tiny and dependency-free
+- ✅ Built-in `fetch` under the hood — no need to install axios!
+- ✅ Works out of the box with native `fetch`
+- ✅ TypeScript support
+- ✅ Dual ESM & CommonJS support (Node.js 22+)
+- ✅ Improved error reporting (context-aware)
 
 ---
 
@@ -20,6 +22,14 @@ Built from real-world frustration with unreliable APIs and network issues.
 
 ```bash
 npm install oh-no-again
+```
+
+```js
+// For CommonJS (Node.js 22+)
+const { retryHelper, requestBatcher } = require('oh-no-again');
+
+// For ESM (Node.js 22+)
+import { retryHelper, requestBatcher } from 'oh-no-again';
 ```
 
 ---

@@ -42,7 +42,9 @@ async function requestBatcher(data, batchSize, taskFn, options = {}) {
           ? retryHelper(fn, { retries, delay, timeout })
           : fn();
       return result
-        .then((res) => (returnMeta ? { item, res, success: true } : res))
+        .then((res) =>
+          returnMeta ? { item, result: res, success: true } : res,
+        )
         .catch((err) => {
           if (failFast) throw err;
           return returnMeta
