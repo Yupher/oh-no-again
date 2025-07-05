@@ -1,5 +1,9 @@
 # oh-no-again.js 😬
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/yupher/oh-no-again/main/logo.png" alt="oh-no-again.js logo" width="200"/>
+</p>
+
 A tiny and powerful retry + batching + timeout + abort utility for Node.js.  
 Built from real-world frustration with unreliable APIs and network issues.
 
