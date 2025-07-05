@@ -1,5 +1,5 @@
-const { requestBatcher } = require('./src/requestBatcher');
-const { retryHelper } = require('./src/retryHelper');
+const { requestBatcher } = require('../index.js');
+const { retryHelper } = require('../index.js');
 
 /**
  * @module oh-no-again

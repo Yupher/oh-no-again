@@ -1,5 +1,5 @@
-import { retryHelper } from '../src/retryHelper.js';
-import { requestBatcher } from '../src/requestBatcher.js';
+import { retryHelper } from '../index.js';
+import { requestBatcher } from '../index.js';
 
 /**
  * @module oh-no-again
