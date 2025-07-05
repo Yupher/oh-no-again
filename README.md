@@ -41,9 +41,16 @@ import { retryHelper, requestBatcher } from 'oh-no-again';
 ```js
 const { retryHelper } = require('oh-no-again');
 
-const result = await retryHelper(async (signal) => {
-  return await fetch('https://api.example.com/data', { signal });
-});
+const result = await retryHelper(
+  async (signal) => {
+    return await fetch('https://api.example.com/data', { signal });
+  },
+  {
+    retries: 3, //number of retries if the request fails
+    delay: 300, // delay between each retry it goes delay * 2 ** i
+    timeout: 300, // ms: abort if request takes too long
+  },
+);
 ```
 
 ### 🚦 Batching with concurrency limit
@@ -65,11 +72,15 @@ const result = await requestBatcher(
   2, // max 2 at a time
   (user) => ({
     url: `https://jsonplaceholder.typicode.com/users/${user.id}`,
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
   }),
   {
-    retries: 3,
-    delay: 200,
-    timeout: 1000,
+    retries: 3, //number of retries if the request fails
+    delay: 300, // delay between each retry it goes delay * 2 ** i
+    timeout: 300, // ms: abort if request takes too long
+    returnMeta: true, // if true return [{success: true|false, item, result|error}] else [{result|null}]
+    failFast: false, // if true it thorws an error if at least one failed
   },
 );
 ```
@@ -87,20 +98,35 @@ const result = await requestBatcher(
 
 ### `requestBatcher(array, concurrency, taskFn, options)`
 
-| Param         | Type                          | Description                     |
-| ------------- | ----------------------------- | ------------------------------- |
-| `array`       | `Array`                       | Items to process                |
-| `concurrency` | `number`                      | Max parallel operations         |
-| `taskFn`      | `(item) => TaskRequest`       | Function returning fetch config |
-| `options`     | `{ retries, delay, timeout }` | Optional retry config           |
+| Param         | Type                                                | Description                     |
+| ------------- | --------------------------------------------------- | ------------------------------- |
+| `array`       | `Array`                                             | Items to process                |
+| `concurrency` | `number`                                            | Max parallel operations         |
+| `taskFn`      | `(item) => TaskRequest`                             | Function returning fetch config |
+| `options`     | `{ retries, delay, timeout, returnMeta, failFast }` | Optional retry config           |
 
 ---
+
+### TaskRequest
+
+```ts
+{
+  url: string;
+  method?: string;
+  headers?: Record<string, string>;
+  body?: any;
+}
+```
 
 ## 🧠 Requirements
 
 - Node.js v22.0.0 or higher
 
 ## 🆕 Changelog
+
+## v0.2.2
+
+- ✅ Improved Error handling
 
 ### v0.2.1
 
