@@ -15,6 +15,7 @@ Built from real-world frustration with unreliable APIs and network issues.
 - ✅ TypeScript support
 - ✅ Dual ESM & CommonJS support (Node.js 22+)
 - ✅ Improved error reporting (context-aware)
+- ✅ Lifecycle hooks (onRetry, onAbort, onSuccess, onFailure, onBatchStart, onBatchComplete)
 
 ---
 
@@ -49,6 +50,13 @@ const result = await retryHelper(
     retries: 3, //number of retries if the request fails
     delay: 300, // delay between each retry it goes delay * 2 ** i
     timeout: 300, // ms: abort if request takes too long
+    hooks: {
+      onRetry: (err, attempt) =>
+        console.warn(`Retry #${attempt + 1}:`, err.message),
+      onAbort: (err) => console.warn('Aborted:', err.message),
+      onFailure: (err) => console.error('Final failure:', err.message),
+      onSuccess: (res) => console.log('Success:', res),
+    },
   },
 );
 ```
@@ -81,6 +89,17 @@ const result = await requestBatcher(
     timeout: 300, // ms: abort if request takes too long
     returnMeta: true, // if true return [{success: true|false, item, result|error}] else [{result|null}]
     failFast: false, // if true it thorws an error if at least one failed
+    hooks: {
+      onBatchStart: (i, batch) =>
+        console.log(`Starting batch #${i + 1}`, batch),
+      onBatchComplete: (i, results) =>
+        console.log(`Completed batch #${i + 1}`, results),
+      onRetry: (err, attempt) =>
+        console.warn(`Retry #${attempt + 1}:`, err.message),
+      onAbort: (err) => console.warn('Aborted:', err.message),
+      onFailure: (err) => console.error('Final failure:', err.message),
+      onSuccess: (res) => console.log('Success:', res),
+    },
   },
 );
 ```
@@ -124,9 +143,14 @@ const result = await requestBatcher(
 
 ## 🆕 Changelog
 
-## v0.2.2
+### v0.3.0
 
-- ✅ Improved Error handling
+- ✅ Added lifecycle event hooks:
+  - onRetry, onAbort, onFailure, onSuccess
+  - onBatchStart, onBatchComplete
+- ✅ Improved JSDoc style annotations
+- ✅ Full TypeScript definition update (oh-no-again.d.ts)
+- ✅ Enhanced metadata control: failFast, returnMeta
 
 ### v0.2.1
 
@@ -149,12 +173,14 @@ const result = await requestBatcher(
 
 ---
 
+## 🧪 Roadmap
+
 - ✅ Native fetch support
 - ⏳ Axios support (dropped, may revisit)
 - ✅ TypeScript typings
 - ⏳ CLI version
 - ✅ Dual ESM + CJS support
-- ⏳ Event hooks (`onRetry`, `onAbort`, etc.)
+- ✅ Event hooks support
 
 ## 🧑‍💻 Author
 
