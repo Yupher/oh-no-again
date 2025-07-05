@@ -1,6 +1,6 @@
 {
   "name": "oh-no-again",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Retry and batching utility with abort, timeout, and concurrency support. Inspired by real-world pain.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",

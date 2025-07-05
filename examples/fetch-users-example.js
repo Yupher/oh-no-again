@@ -35,11 +35,14 @@ async function fetchUser(id, signal) {
         };
       },
       {
-        retries: 3,
+        retries: 2,
         delay: 300,
-        timeout: 100, // ms: abort if request takes too long
+        timeout: 50, // ms: abort if request takes too long
         returnMeta: true,
         failFast: false,
+        hooks: {
+          onRetry: (err, i) => console.log(i + 1, err.message),
+        },
       },
     );
 
