@@ -1,8 +1,8 @@
-const { requestBatcher } = require('../src');
+const { requestBatcher } = require('../index');
 
 //const fetch = require('node-fetch'); // use `undici` or `node-fetch` in Node.js if needed
 
-const USERS = Array.from({ length: 10 }, (_, i) => ({
+const USERS = Array.from({ length: 5 }, (_, i) => ({
   id: i + 1,
   name: `User ${i + 1}`,
 })); // [1, 2, ..., 10]
@@ -37,14 +37,13 @@ async function fetchUser(id, signal) {
       {
         retries: 3,
         delay: 300,
-        timeout: 400, // ms: abort if request takes too long
+        timeout: 100, // ms: abort if request takes too long
+        returnMeta: true,
+        failFast: false,
       },
     );
 
-    console.log(
-      'Fetched users:',
-      users.map((u) => u.name),
-    );
+    console.log('Fetched users:', users);
   } catch (err) {
     console.error('Fetch failed:', err.message);
   }

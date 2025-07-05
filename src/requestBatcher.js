@@ -26,16 +26,29 @@ const { ohFetch } = require('./ohFetch');
 async function requestBatcher(data, batchSize, taskFn, options = {}) {
   const batches = createBatches(data, batchSize);
   const results = [];
+  const {
+    retries = 3,
+    delay = 300,
+    timeout = 1000,
+    failFast = false,
+    returnMeta = false,
+  } = options;
 
   for (const batch of batches) {
     const promises = batch.map((item) => {
-      const fn = (signal) =>
-        ohFetch(taskFn(item), {
-          ...options,
-          signal, // pass signal to ohFetch
+      const fn = (signal) => ohFetch({ ...taskFn(item), signal });
+      const result =
+        options.retries > 0
+          ? retryHelper(fn, { retries, delay, timeout })
+          : fn();
+      return result
+        .then((res) => (returnMeta ? { item, res, success: true } : res))
+        .catch((err) => {
+          if (failFast) throw err;
+          return returnMeta
+            ? { item, error: err.message || err, success: false }
+            : null;
         });
-
-      return options.retries > 0 ? retryHelper(fn, options) : fn();
     });
 
     const batchResults = await Promise.all(promises);

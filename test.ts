@@ -1,4 +1,4 @@
-import { retryHelper, requestBatcher } from './oh-no-again';
+import { retryHelper, requestBatcher } from './index.js';
 
 retryHelper((signal) => {
   return fetch('https://jsonplaceholder.typicode.com/users/1', { signal });
