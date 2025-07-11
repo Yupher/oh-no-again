@@ -1,6 +1,6 @@
 {
   "name": "oh-no-again",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Retry and batching utility with abort, timeout, and concurrency support. Inspired by real-world pain.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
@@ -26,6 +26,11 @@
     "concurrency",
     "timeout"
   ],
+  "scripts": {
+    "test": "vitest run --coverage",
+    "test:dev": "vitest",
+    "test:watch": "vitest"
+  },
   "author": "Bouhadjila Hamza",
   "license": "MIT",
   "repository": {
@@ -39,6 +44,15 @@
     "node": ">=22.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "@vitest/coverage-v8": "^3.2.4",
+    "execa": "^9.6.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "bin": {
+    "oha": "./bin/oha"
+  },
+  "dependencies": {
+    "minimist": "^1.2.8"
   }
 }

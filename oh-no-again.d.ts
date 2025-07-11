@@ -40,19 +40,21 @@ export interface TaskRequest {
  * Same as RetryOptions, reused for batching.
  */
 export interface BatcherOptions extends RetryOptions {
-  failFast?: boolean; // Stop all on first error
-  returnMeta?: boolean; // Return full metadata per task
+  failFast?: boolean; // If true, aborts the batch immediately on first failure
+  returnMeta?: boolean; // // If true, results include { item, result/error, success }
   hooks?: BatchHooks;
 }
 export interface BatchSuccess<TInput, TResult> {
   item: TInput;
   result: TResult;
+  status?: number;
   success: true;
 }
 
 export interface BatchFailure<TInput> {
   item: TInput;
   error: string;
+  status?: number;
   success: false;
 }
 export interface RetryHooks {
@@ -83,7 +85,7 @@ export type BatchResult<TInput, TResult> =
 export function requestBatcher<TInput, TResult>(
   array: TInput[],
   concurrency: number,
-  taskFn: (item: TInput) => TaskRequest,
+  taskFn: (item: TInput) => TaskRequest | false,
   options?: BatcherOptions,
 ): Promise<Array<BatchResult<TInput, TResult>>>;
 
