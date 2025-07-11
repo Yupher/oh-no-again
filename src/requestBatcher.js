@@ -26,7 +26,7 @@ const { ohFetch } = require('./ohFetch');
  * @template TResult
  * @param {TInput[]} data - The array of input items to process.
  * @param {number} batchSize - The number of concurrent requests to run at a time.
- * @param {(item: TInput) => { url: string, method?: string, headers?: Record<string, string>, body?: any }} taskFn - Function that returns fetch configuration for each item.
+ * @param {(item: TInput) => { url: string, method?: string, headers?: Record<string, string>, body?: any } | false} taskFn - Function that returns fetch config or `false` to skip.
  * @param {RequestBatcherOptions} [options={}] - Optional configuration for retries and fetch.
  * @returns {Promise<TResult[]>} Resolves with an array of results.
  */
@@ -46,6 +46,18 @@ async function requestBatcher(data, batchSize, taskFn, options = {}) {
     if (hooks.onBatchStart) hooks.onBatchStart(index, batch);
 
     const promises = batch.map((item) => {
+      // for conditional fetching
+      if (!taskFn(item)) {
+        if (returnMeta) {
+          return Promise.resolve({
+            item,
+            success: false,
+            skipped: true,
+            error: 'Skipped: false or invalid task',
+          });
+        }
+        return Promise.resolve(null); // silently skipped
+      }
       const fn = (signal) => ohFetch({ ...taskFn(item), signal });
       const result =
         options.retries > 0
