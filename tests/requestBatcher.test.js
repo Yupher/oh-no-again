@@ -29,11 +29,11 @@ describe('requestBatcher', () => {
       data,
       2,
       (item) => ({
-        url: 'https://httpbin.org/get',
+        url: `https://jsonplaceholder.typicode.com/users/${item}`,
         method: 'GET',
       }),
       {
-        retries: 3,
+        retries: 1,
         timeout: 1000,
         returnMeta: true,
         hooks,
@@ -53,7 +53,10 @@ describe('requestBatcher', () => {
     const result = await requestBatcher(
       data,
       1,
-      (item) => (item === 2 ? false : { url: 'https://httpbin.org/get' }),
+      (item) =>
+        item === 2
+          ? false
+          : { url: `https://jsonplaceholder.typicode.com/users/${item}` },
       {
         returnMeta: true,
       },
@@ -71,7 +74,7 @@ describe('requestBatcher', () => {
       [1],
       1,
       () => ({
-        url: 'https://httpstat.us/500', // always fails
+        url: `https://jsonplaceholder.typicode.com/usersq/`, // always fails
         method: 'GET',
       }),
       {
