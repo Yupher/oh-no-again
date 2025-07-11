@@ -20,6 +20,8 @@ Built from real-world frustration with unreliable APIs and network issues.
 - ✅ Dual ESM & CommonJS support (Node.js 22+)
 - ✅ Improved error reporting (context-aware)
 - ✅ Lifecycle hooks (onRetry, onAbort, onSuccess, onFailure, onBatchStart, onBatchComplete)
+- ✅ Conditional skipping (`taskFn => false`)
+- ✅ CLI tool to batch HTTP requests from a file
 
 ---
 
@@ -82,11 +84,14 @@ const users = [
 const result = await requestBatcher(
   users,
   2, // max 2 at a time
-  (user) => ({
-    url: `https://jsonplaceholder.typicode.com/users/${user.id}`,
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  }),
+  (user) =>
+    user.id === 6
+      ? false /*id 6  will be skipped*/
+      : {
+          url: `https://jsonplaceholder.typicode.com/users/${user.id}`,
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        },
   {
     retries: 3, //number of retries if the request fails
     delay: 300, // delay between each retry it goes delay * 2 ** i
@@ -108,6 +113,35 @@ const result = await requestBatcher(
 );
 ```
 
+## 🧪 CLI Usage
+
+Run batch HTTP requests from a `.json` input file using `oha`:
+
+```bash
+npx oha --input users.json --url "https://api.example.com/users/{{item.id}}"
+```
+
+Where `users.json` contains an array of objects:
+
+```json
+[{ "id": 1 }, { "id": 2 }]
+```
+
+### Available Options:
+
+- `--input` Path to the input JSON file
+- `--url` URL template with `{{variable}}` placeholders
+- `--concurrency` Max parallel requests (default: 5)
+- `--retries` Retry attempts per request (default: 3)
+- `--delay` Initial delay between retries (ms)
+- `--timeout` Request timeout in milliseconds
+- `--meta` Return full result with status and error info
+- `--fail-fast` Stop on first error
+
+```bash
+npx oha --input users.json --url "https://api.example.com/users/{{id}}" --meta
+```
+
 ---
 
 ## ⚙️ API
@@ -126,6 +160,7 @@ const result = await requestBatcher(
 | `array`       | `Array`                                             | Items to process                |
 | `concurrency` | `number`                                            | Max parallel operations         |
 | `taskFn`      | `(item) => TaskRequest`                             | Function returning fetch config |
+|               |                                                     | or false to skip                |
 | `options`     | `{ retries, delay, timeout, returnMeta, failFast }` | Optional retry config           |
 
 ---
@@ -146,6 +181,17 @@ const result = await requestBatcher(
 - Node.js v22.0.0 or higher
 
 ## 🆕 Changelog
+
+### v0.4.0
+
+- ✅ Added support for **conditional skipping** via `taskFn` returning `false`
+- ✅ Included **HTTP status code** in batch result metadata
+- ✅ Added `skipped: true` in meta if task is skipped
+- ✅ Improved `.d.ts` TypeScript typings
+- ✅ Introduced **CLI tool** to run batch fetches from JSON files
+- ✅ Added CLI tests (`cli.test.js`)
+- ✅ Setup GitHub Actions to run tests before merging to main
+- 🧪 Improved test coverage and automated validation flow
 
 ### v0.3.0
 
