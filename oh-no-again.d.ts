@@ -47,12 +47,14 @@ export interface BatcherOptions extends RetryOptions {
 export interface BatchSuccess<TInput, TResult> {
   item: TInput;
   result: TResult;
+  status?: number;
   success: true;
 }
 
 export interface BatchFailure<TInput> {
   item: TInput;
   error: string;
+  status?: number;
   success: false;
 }
 export interface RetryHooks {

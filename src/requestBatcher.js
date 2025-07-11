@@ -70,12 +70,19 @@ async function requestBatcher(data, batchSize, taskFn, options = {}) {
           : fn();
       return result
         .then((res) =>
-          returnMeta ? { item, result: res, success: true } : res,
+          returnMeta
+            ? { item, result: res.data, status: res.status, success: true }
+            : res.data,
         )
         .catch((err) => {
           if (failFast) throw err;
           return returnMeta
-            ? { item, error: err.message || err, success: false }
+            ? {
+                item,
+                error: err.message || err,
+                status: err.status || 500,
+                success: false,
+              }
             : null;
         });
     });

@@ -28,20 +28,22 @@ async function ohFetch(data) {
   };
 
   const response = await fetch(data.url, finalOptions);
+  const contentType = res.headers.get('content-type') || '';
+  const isJson = contentType.includes('application/json');
+  const dataParsed = isJson ? await response.json() : await response.text();
 
   if (!response.ok) {
-    const errorText = await response.text().catch(() => '');
-    throw new Error(
-      `Fetch failed with ${response.status} ${response.statusText}. Body: ${errorText}`,
+    const error = new Error(
+      `Fetch failed with ${response.status} ${
+        response.statusText
+      }. Body: ${JSON.stringify(dataParsed)}`,
     );
+    error.status = response.status;
+    error.responseBody = dataParsed;
+    throw error;
   }
 
-  const contentType = response.headers.get('content-type');
-  if (contentType?.includes('application/json')) {
-    return await response.json();
-  }
-
-  return await response.text(); // fallback
+  return { data: dataParsed, status: response.status };
 }
 
 module.exports = { ohFetch };
