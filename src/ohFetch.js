@@ -28,7 +28,7 @@ async function ohFetch(data) {
   };
 
   const response = await fetch(data.url, finalOptions);
-  const contentType = res.headers.get('content-type') || '';
+  const contentType = response.headers.get('content-type') || '';
   const isJson = contentType.includes('application/json');
   const dataParsed = isJson ? await response.json() : await response.text();
 
