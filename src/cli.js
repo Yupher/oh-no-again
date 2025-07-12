@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const minimist = require('minimist');
-const { requestBatcher } = require('../index');
+const { requestBatcher } = require('oh-no-again');
 
 const args = minimist(process.argv.slice(2), {
   boolean: ['meta', 'fail-fast'],
